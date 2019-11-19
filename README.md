@@ -6,7 +6,7 @@ Terraform module that will create the bastion inside a VPC that will grant acces
 
 ```hcl
 module "bastion" {
-  source = "github.com/ministryofjustice/cloud-platform-terraform-bastion"
+  source = "github.com/ministryofjustice/cloud-platform-terraform-bastion?ref=0.0.1"
 
   vpc_id                   = "vpc-1234567890"
   key_name                 = "cp-mogaal"
