@@ -10,7 +10,8 @@ data "aws_caller_identity" "current" {}
 
 # It's possible to get Route53 zone_id using cluster_base_domain_name
 data "aws_route53_zone" "selected" {
-  name = var.cluster_base_domain_name
+  depends_on = [var.bastion_depends_on]
+  name       = var.cluster_base_domain_name
 }
 
 # It's possible to get the public subnets knowing the VPC_ID
@@ -171,7 +172,7 @@ resource "aws_launch_configuration" "bastion" {
   iam_instance_profile = aws_iam_instance_profile.bastion.name
   image_id             = data.aws_ami.debian_stretch_latest.image_id
   instance_type        = "t2.nano"
-  key_name             = aws_key_pair.cluster.key_name
+  key_name             = var.key_name
   security_groups      = [aws_security_group.bastion.id]
   user_data            = data.template_cloudinit_config.bastion.rendered
 
