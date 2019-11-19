@@ -10,7 +10,7 @@ data "aws_caller_identity" "current" {}
 
 # It's possible to get Route53 zone_id using cluster_base_domain_name
 data "aws_route53_zone" "selected" {
-  name       = var.route53_zone
+  name = var.route53_zone
 }
 
 # It's possible to get the public subnets knowing the VPC_ID
