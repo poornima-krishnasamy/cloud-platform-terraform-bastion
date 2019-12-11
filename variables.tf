@@ -14,6 +14,11 @@ variable "key_name" {
   type        = string
 }
 
+variable "public_subnets" {
+  description = "The public subnets IDs where bastion ASG will use"
+  type        = list
+}
+
 variable "bastion_depends_on" {
   type    = any
   default = null

@@ -13,16 +13,6 @@ data "aws_route53_zone" "selected" {
   name = var.route53_zone
 }
 
-# It's possible to get the public subnets knowing the VPC_ID
-data "aws_subnet_ids" "public_subnets" {
-  vpc_id = var.vpc_id
-
-  tags = {
-    SubnetType = "Utility"
-  }
-
-}
-
 data "aws_ami" "debian_stretch_latest" {
   most_recent      = true
   executable_users = ["all"]
@@ -194,7 +184,7 @@ resource "aws_autoscaling_group" "bastion" {
   health_check_type         = "EC2"
   force_delete              = true
   launch_configuration      = aws_launch_configuration.bastion.name
-  vpc_zone_identifier       = data.aws_subnet_ids.public_subnets.ids
+  vpc_zone_identifier       = var.public_subnets
   default_cooldown          = 60
 
   tags = [
