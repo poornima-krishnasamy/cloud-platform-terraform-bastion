@@ -18,7 +18,7 @@ module "bastion" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
-| vpc_id | The VPC where bastion is going to be deployed | string |  | yes |
+| vpc_name | The VPC where bastion is going to be deployed | string |  | yes |
 | route53_zone | The DNS hostzone where bastion is going to be created, usually is going to be something like bastion.$clusterName.cloud-platform.service.justice.gov.uk. | string | | yes |
 | key_name | The key_pair name to be used in the bastion instance | string | | yes |
 
