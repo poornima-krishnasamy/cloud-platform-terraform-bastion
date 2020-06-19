@@ -8,6 +8,21 @@ locals {
 data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
+data "aws_vpc" "selected" {
+  filter {
+    name   = "tag:Name"
+    values = [var.vpc_name]
+  }
+}
+
+data "aws_subnet_ids" "public" {
+  vpc_id = data.aws_vpc.selected.id
+
+  tags = {
+    SubnetType = "Utility"
+  }
+}
+
 # It's possible to get Route53 zone_id using cluster_base_domain_name
 data "aws_route53_zone" "selected" {
   name = var.route53_zone
@@ -91,7 +106,7 @@ EOF
 resource "aws_security_group" "bastion" {
   name        = local.bastion_fqdn
   description = "Security group for bastion"
-  vpc_id      = var.vpc_id
+  vpc_id      = data.aws_vpc.selected.id
 
   // non-standard port to reduce probes
   ingress {
@@ -161,7 +176,7 @@ resource "aws_launch_configuration" "bastion" {
   iam_instance_profile = aws_iam_instance_profile.bastion.name
   image_id             = data.aws_ami.debian_stretch_latest.image_id
   instance_type        = "t2.nano"
-  key_name             = var.key_name
+  key_name             = aws_key_pair.vpc.key_name
   security_groups      = [aws_security_group.bastion.id]
   user_data            = data.template_cloudinit_config.bastion.rendered
 
@@ -184,7 +199,7 @@ resource "aws_autoscaling_group" "bastion" {
   health_check_type         = "EC2"
   force_delete              = true
   launch_configuration      = aws_launch_configuration.bastion.name
-  vpc_zone_identifier       = var.public_subnets
+  vpc_zone_identifier       = data.aws_subnet_ids.public.ids
   default_cooldown          = 60
 
   tags = [
@@ -204,3 +219,16 @@ resource "aws_route53_record" "bastion" {
   records = [aws_eip.bastion.public_ip]
 }
 
+############
+# Key Pair #
+############
+
+resource "tls_private_key" "vpc" {
+  algorithm = "RSA"
+  rsa_bits  = "2048"
+}
+
+resource "aws_key_pair" "vpc" {
+  key_name   = var.cluster_domain_name
+  public_key = tls_private_key.vpc.public_key_openssh
+}
