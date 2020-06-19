@@ -9,7 +9,7 @@ variable "vpc_name" {
   type        = string
 }
 
-variable "key_name" {
-  description = "The key_pair name to be used in the bastion instance"
+variable "cluster_domain_name" {
+  description = "Domain name is used to generate key_pair name to be used in the bastion instance"
   type        = string
 }

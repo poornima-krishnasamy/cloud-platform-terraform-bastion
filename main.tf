@@ -176,7 +176,7 @@ resource "aws_launch_configuration" "bastion" {
   iam_instance_profile = aws_iam_instance_profile.bastion.name
   image_id             = data.aws_ami.debian_stretch_latest.image_id
   instance_type        = "t2.nano"
-  key_name             = var.key_name
+  key_name             = aws_key_pair.vpc.key_name
   security_groups      = [aws_security_group.bastion.id]
   user_data            = data.template_cloudinit_config.bastion.rendered
 
@@ -219,3 +219,16 @@ resource "aws_route53_record" "bastion" {
   records = [aws_eip.bastion.public_ip]
 }
 
+############
+# Key Pair #
+############
+
+resource "tls_private_key" "vpc" {
+  algorithm = "RSA"
+  rsa_bits  = "2048"
+}
+
+resource "aws_key_pair" "vpc" {
+  key_name   = var.cluster_domain_name
+  public_key = tls_private_key.vpc.public_key_openssh
+}
