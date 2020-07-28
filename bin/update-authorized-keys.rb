@@ -37,7 +37,7 @@ def main
     end
   end
 
-
+  puts authorized_keys
 rescue NoMethodError # we get this if we call 'dig' on nil
   # Experimental modules may not have any releases, so just return nothing
   nil
